@@ -27,6 +27,11 @@ def build_ics(file_path, student_schedules):
         creates an event for each row in the student_schedules list and adds it to the calendar
         """
 
+        if not (row.get("Start Time") or "").strip() or not (row.get("End Time") or "").strip():
+            print(f"Skipping row with no meeting time: "
+                f"{row.get('Section Name')} / {row.get('Student ID')}")
+            continue
+
         start = parse_dt(row.get("Section Start Date"), row.get("Start Time"))
         end = parse_dt(row.get("Section End Date"), row.get("End Time"))
         until = parse_dt(row.get("Section End Date"), row.get("End Time"))
@@ -36,14 +41,13 @@ def build_ics(file_path, student_schedules):
             start=start,
             end=end,
             summary="{}-{}".format(row.get("Section Name"), row.get("Student ID"))
-            
         )
 
         #adding recurrence rule to event
         meeting_days = row.get("Meeting Days", "")
         event.add('rrule', build_recurrence_rule(meeting_days, until))
 
-        cal.add(event)
+        cal.add_component(event)
         
 
 DAY_MAP = {
@@ -60,6 +64,9 @@ DAY_MAP = {
 
 def parse_dt(date_str, time_str):
     """date_str like '2026-01-20', time_str like '08:30 AM' (Eastern)"""
+
+    date_str = (date_str or "").strip()
+    time_str = (time_str or "").strip().upper()
     return datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %I:%M %p").replace(tzinfo=TZ)
 
 

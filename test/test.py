@@ -3,7 +3,7 @@ import unittest
 from src.digest_csv import digest_csv
 from pathlib import Path
 from datetime import datetime, timezone
-from src.build_ics import parse_dt, build_recurrence_rule
+from src.build_ics import parse_dt, build_recurrence_rule, build_ics
 from zoneinfo import ZoneInfo
 
 def debug():
@@ -16,6 +16,10 @@ def debug():
     #     print(schedule)
 
     print(schedules[1].get("Student ID"))
+
+    save_path = script_dir / "test.ics"
+    build_ics(save_path, schedules)
+    
 
 
 class TestParseDt(unittest.TestCase):
